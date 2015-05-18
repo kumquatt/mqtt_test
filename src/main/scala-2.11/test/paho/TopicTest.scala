@@ -1,8 +1,8 @@
 package test.paho
 
-import org.eclipse.paho.client.mqttv3._
+import org.eclipse.paho.client.mqttv3.{MqttClient, MqttConnectOptions}
 
-object UnsubscribeTest extends App {
+object TopicTest extends App {
 
   val option = new MqttConnectOptions
   val client1 = new MqttClient("tcp://127.0.0.1:1883", "client_1")
@@ -18,51 +18,40 @@ object UnsubscribeTest extends App {
   client2.connect(option)
 
   /////////////////
-  client1.subscribe("a/b", 2)
-  client1.subscribe("a/+", 2)
-  client2.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
+  client1.subscribe("a/#", 2)
 
-  client2.publish("a/b", "a/b 1111".getBytes, 0, false)
-
-  println("-----")
+  client2.publish("a/b", "a/b topic qos 0".getBytes, 0, false)
   Thread.sleep(1000)
-
-  assert((callback_client1.getMessages ::: callback_client2.getMessages).size == 3)
-  callback_client1.clearMessages
-  callback_client2.clearMessages
-
-  client1.unsubscribe("a/b")
-  client2.publish("a/b", "a/b 22222".getBytes, 0, false)
-  println("-----")
-  Thread.sleep(1000)
-
-  assert((callback_client1.getMessages ::: callback_client2.getMessages).size == 2)
-
-  callback_client1.clearMessages
-  callback_client2.clearMessages
-
-  client1.unsubscribe("a/+")
-  client2.publish("a/b", "a/b 33333".getBytes, 0, false)
-  println("-----")
-  Thread.sleep(1000)
-
+  println("--------")
   assert((callback_client1.getMessages ::: callback_client2.getMessages).size == 1)
-
   callback_client1.clearMessages
   callback_client2.clearMessages
 
-  client2.unsubscribe("a/#")
-  client2.publish("a/b", "a/b 44444".getBytes, 0, false)
-
-  println("-----")
+  client2.publish("a/b", "a/b topic qos 1".getBytes, 1, false)
   Thread.sleep(1000)
+  println("--------")
+  assert((callback_client1.getMessages ::: callback_client2.getMessages).size == 1)
+  callback_client1.clearMessages
+  callback_client2.clearMessages
 
-  assert((callback_client1.getMessages ::: callback_client2.getMessages).size == 0)
+  client2.publish("a/b", "a/b topic qos 2".getBytes, 0, false)
+  Thread.sleep(1000)
+  println("--------")
+  assert((callback_client1.getMessages ::: callback_client2.getMessages).size == 1)
+  callback_client1.clearMessages
+  callback_client2.clearMessages
 
   client1.disconnect()
   client1.close()
 
   client2.disconnect()
   client2.close()
-
 }
